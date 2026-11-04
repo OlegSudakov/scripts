@@ -6,7 +6,7 @@ sudo_cmd=()
 "${sudo_cmd[@]}" apt-get update
 "${sudo_cmd[@]}" apt-get install -y git curl python3 python3-venv
 
-curl -fsSL https://chatgpt.com/codex/install.sh | sh
+curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
 curl -fsSL https://claude.ai/install.sh | bash -s latest
 
 while read -r repo commit; do
@@ -31,4 +31,11 @@ rc="$HOME/.bashrc"
 path_line=$(printf 'export PATH=%q:"$PATH"' "$tool_path")
 grep -qxF -- "$path_line" "$rc" 2>/dev/null || printf '\n%s\n' "$path_line" >> "$rc"
 
-echo "Done. Run: source $rc"
+if [[ -f "$HOME/.bashrc" ]]; then
+  # Shell startup files may assume unset variables and tolerate nonzero commands.
+  set +eu
+  source "$HOME/.bashrc"
+  set -eu
+fi
+
+echo "Done."
