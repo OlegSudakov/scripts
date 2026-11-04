@@ -13,10 +13,10 @@ while read -r repo commit; do
   [[ -d "$repo/.git" ]] || git clone "https://github.com/unclebob/$repo.git"
   git -C "$repo" checkout --detach "$commit"
 done <<'REPOS'
-ub-mode 57a8bdd
-crapper 6fd92c4
-dryer 66ff6d2
-mutator a5a0cb8
+ub-mode 3da62bf3fcfd2034de41f30d920d2739e566171f
+crapper 6fd92c4c9bcc56efb64a2f8743d5a2993bcfd42d
+dryer 66ff6d21a42c04afcad89c78a80066176d1294b0
+mutator a5a0cb803b66e0cdb8bf471b3b08af701d424a41
 REPOS
 
 for skills in "$HOME/.agents/skills" "$HOME/.claude/skills"; do
