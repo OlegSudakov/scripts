@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-sudo_cmd=()
-[[ "${1:-}" != "--sudo" ]] || sudo_cmd=(sudo)
-"${sudo_cmd[@]}" apt-get update
-"${sudo_cmd[@]}" apt-get install -y git curl python3 python3-venv
-
 curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
 curl -fsSL https://claude.ai/install.sh | bash -s latest
 
