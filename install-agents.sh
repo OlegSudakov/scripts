@@ -14,9 +14,35 @@ dryer 66ff6d21a42c04afcad89c78a80066176d1294b0
 mutator a5a0cb803b66e0cdb8bf471b3b08af701d424a41
 REPOS
 
+# Clone external skill repositories and pin exact commits.
+while read -r repo url commit; do
+  [[ -d "$repo/.git" ]] || git clone --depth 1 "$url" "$repo"
+
+  # Fetch the pinned commit if it isn't available locally.
+  if ! git -C "$repo" cat-file -e "${commit}^{commit}" 2>/dev/null; then
+    git -C "$repo" fetch --depth 1 origin "$commit"
+  fi
+
+  git -C "$repo" checkout --detach "$commit"
+done <<'SKILL_REPOS'
+agent_skills https://github.com/janestreet/agent_skills.git 7c6715c29548a3b39d4a9545c698ee4fd17a7213
+mattpocock-skills https://github.com/mattpocock/skills.git 5863806dd4e15c63174bee4e7515a4256792ecfa
+SKILL_REPOS
+
 for skills in "$HOME/.agents/skills" "$HOME/.claude/skills"; do
   mkdir -p "$skills/ub-mode"
   cp ub-mode/SKILL.md "$skills/ub-mode/SKILL.md"
+
+  # Copy complete skill directories, including supporting files.
+  while read -r src name; do
+    [[ -f "$src/SKILL.md" ]] || { echo "Missing $src/SKILL.md" >&2; exit 1; }
+    mkdir -p "$skills/$name"
+    cp -R "$src/." "$skills/$name/"
+  done <<'SKILLS'
+agent_skills/socratic-tutor socratic-tutor
+mattpocock-skills/skills/productivity/grill-me grill-me
+mattpocock-skills/skills/productivity/grilling grilling
+SKILLS
 done
 
 tool_path="$HOME/.local/bin:$PWD/crapper:$PWD/dryer:$PWD/mutator"
